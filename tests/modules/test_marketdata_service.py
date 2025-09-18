@@ -1,10 +1,12 @@
 import pytest
 from unittest.mock import AsyncMock, patch
+from datetime import datetime
+from decimal import Decimal
 
 from app.storage import DataManager
 from app.modules.marketdata.service import MarketDataService
 from app.modules.marketdata.schemas import SecurityCreate
-from app.modules.marketdata.models import Security
+from app.modules.marketdata.models import Security, Quote
 
 
 class TestMarketDataServiceIntegration:
