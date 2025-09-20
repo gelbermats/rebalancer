@@ -8,50 +8,50 @@ from app.modules.portfolio.models import Portfolio, Position
 
 
 class TestPortfolioServiceIntegration:
-    """Integration tests for PortfolioService with DataManager"""
+    ''"Integration tests for PortfolioService with DataManager''"
     
     @pytest.fixture
     def data_manager(self):
-        """Create a fresh DataManager instance for each test"""
+        ''"Create a fresh DataManager instance for each test''"
         return DataManager()
     
     @pytest.fixture
     def portfolio_service(self, data_manager):
-        """Create PortfolioService with injected DataManager"""
+        ''"Create PortfolioService with injected DataManager''"
         return PortfolioService(data_manager)
     
     @pytest.mark.asyncio
     async def test_create_portfolio(self, portfolio_service):
-        """Test portfolio creation without global variables"""
+        ''"Test portfolio creation without global variables''"
         portfolio_data = PortfolioCreate(
-            name="Test Portfolio",
-            description="Test Description"
+            name='Test Portfolio',
+            description='Test Description'
         )
         
         portfolio = await portfolio_service.create_portfolio(portfolio_data)
         
         assert portfolio.id == 1
-        assert portfolio.name == "Test Portfolio"
-        assert portfolio.description == "Test Description"
+        assert portfolio.name == 'Test Portfolio'
+        assert portfolio.description == 'Test Description'
     
     @pytest.mark.asyncio
     async def test_create_multiple_portfolios(self, portfolio_service):
-        """Test that ID generation works correctly without globals"""
-        portfolio1_data = PortfolioCreate(name="Portfolio 1")
-        portfolio2_data = PortfolioCreate(name="Portfolio 2")
+        ''"Test that ID generation works correctly without globals''"
+        portfolio1_data = PortfolioCreate(name='Portfolio 1')
+        portfolio2_data = PortfolioCreate(name='Portfolio 2')
         
         portfolio1 = await portfolio_service.create_portfolio(portfolio1_data)
         portfolio2 = await portfolio_service.create_portfolio(portfolio2_data)
         
         assert portfolio1.id == 1
         assert portfolio2.id == 2
-        assert portfolio1.name == "Portfolio 1"
-        assert portfolio2.name == "Portfolio 2"
+        assert portfolio1.name == 'Portfolio 1'
+        assert portfolio2.name == 'Portfolio 2'
     
     @pytest.mark.asyncio
     async def test_get_portfolio(self, portfolio_service):
-        """Test retrieving a portfolio by ID"""
-        portfolio_data = PortfolioCreate(name="Test Portfolio")
+        ''"Test retrieving a portfolio by ID''"
+        portfolio_data = PortfolioCreate(name='Test Portfolio')
         created_portfolio = await portfolio_service.create_portfolio(portfolio_data)
         
         retrieved_portfolio = await portfolio_service.get_portfolio(created_portfolio.id)
@@ -62,15 +62,15 @@ class TestPortfolioServiceIntegration:
     
     @pytest.mark.asyncio
     async def test_get_nonexistent_portfolio(self, portfolio_service):
-        """Test retrieving a non-existent portfolio"""
+        ''"Test retrieving a non-existent portfolio''"
         portfolio = await portfolio_service.get_portfolio(999)
         assert portfolio is None
     
     @pytest.mark.asyncio
     async def test_get_portfolios(self, portfolio_service):
-        """Test retrieving all portfolios"""
-        portfolio_data1 = PortfolioCreate(name="Portfolio 1")
-        portfolio_data2 = PortfolioCreate(name="Portfolio 2")
+        ''"Test retrieving all portfolios''"
+        portfolio_data1 = PortfolioCreate(name='Portfolio 1')
+        portfolio_data2 = PortfolioCreate(name='Portfolio 2')
         
         await portfolio_service.create_portfolio(portfolio_data1)
         await portfolio_service.create_portfolio(portfolio_data2)
@@ -78,46 +78,46 @@ class TestPortfolioServiceIntegration:
         portfolios = await portfolio_service.get_portfolios()
         
         assert len(portfolios) == 2
-        assert portfolios[0].name == "Portfolio 1"
-        assert portfolios[1].name == "Portfolio 2"
+        assert portfolios[0].name == 'Portfolio 1'
+        assert portfolios[1].name == 'Portfolio 2'
     
     @pytest.mark.asyncio
     async def test_create_position(self, portfolio_service):
-        """Test position creation without global variables"""
+        ''"Test position creation without global variables''"
         # First create a portfolio
-        portfolio_data = PortfolioCreate(name="Test Portfolio")
+        portfolio_data = PortfolioCreate(name='Test Portfolio')
         portfolio = await portfolio_service.create_portfolio(portfolio_data)
         
         # Then create a position
         position_data = PositionCreate(
             portfolio_id=portfolio.id,
-            secid="SBER",
+            secid='SBER',
             quantity=100,
-            target_weight=Decimal("0.25")
+            target_weight=Decimal('0.25')
         )
         
         position = await portfolio_service.create_position(position_data)
         
         assert position.id == 1
         assert position.portfolio_id == portfolio.id
-        assert position.secid == "SBER"
+        assert position.secid == 'SBER'
         assert position.quantity == 100
-        assert position.target_weight == Decimal("0.25")
+        assert position.target_weight == Decimal('0.25')
     
     @pytest.mark.asyncio
     async def test_create_multiple_positions(self, portfolio_service):
-        """Test that position ID generation works correctly"""
-        portfolio_data = PortfolioCreate(name="Test Portfolio")
+        ''"Test that position ID generation works correctly''"
+        portfolio_data = PortfolioCreate(name='Test Portfolio')
         portfolio = await portfolio_service.create_portfolio(portfolio_data)
         
         position1_data = PositionCreate(
             portfolio_id=portfolio.id,
-            secid="SBER",
+            secid='SBER',
             quantity=100
         )
         position2_data = PositionCreate(
             portfolio_id=portfolio.id,
-            secid="GAZP",
+            secid='GAZP',
             quantity=50
         )
         
@@ -126,23 +126,23 @@ class TestPortfolioServiceIntegration:
         
         assert position1.id == 1
         assert position2.id == 2
-        assert position1.secid == "SBER"
-        assert position2.secid == "GAZP"
+        assert position1.secid == 'SBER'
+        assert position2.secid == 'GAZP'
     
     @pytest.mark.asyncio
     async def test_get_portfolio_positions(self, portfolio_service):
-        """Test retrieving positions for a portfolio"""
-        portfolio_data = PortfolioCreate(name="Test Portfolio")
+        ''"Test retrieving positions for a portfolio''"
+        portfolio_data = PortfolioCreate(name='Test Portfolio')
         portfolio = await portfolio_service.create_portfolio(portfolio_data)
         
         position1_data = PositionCreate(
             portfolio_id=portfolio.id,
-            secid="SBER",
+            secid='SBER',
             quantity=100
         )
         position2_data = PositionCreate(
             portfolio_id=portfolio.id,
-            secid="GAZP",
+            secid='GAZP',
             quantity=50
         )
         
@@ -152,41 +152,41 @@ class TestPortfolioServiceIntegration:
         positions = await portfolio_service.get_portfolio_positions(portfolio.id)
         
         assert len(positions) == 2
-        assert positions[0].secid in ["SBER", "GAZP"]
-        assert positions[1].secid in ["SBER", "GAZP"]
+        assert positions[0].secid in ['SBER', 'GAZP']
+        assert positions[1].secid in ['SBER', 'GAZP']
     
     @pytest.mark.asyncio
     async def test_update_position_market_data(self, portfolio_service):
-        """Test updating position market data"""
-        portfolio_data = PortfolioCreate(name="Test Portfolio")
+        ''"Test updating position market data''"
+        portfolio_data = PortfolioCreate(name='Test Portfolio')
         portfolio = await portfolio_service.create_portfolio(portfolio_data)
         
         position_data = PositionCreate(
             portfolio_id=portfolio.id,
-            secid="SBER",
+            secid='SBER',
             quantity=100
         )
         position = await portfolio_service.create_position(position_data)
         
         # Update with market data
-        market_price = Decimal("250.00")
+        market_price = Decimal('250.00')
         updated_position = await portfolio_service.update_position_market_data(
             position.id, market_price
         )
         
         assert updated_position is not None
         assert updated_position.market_price == market_price
-        assert updated_position.market_value == Decimal("25000.00")  # 100 * 250
+        assert updated_position.market_value == Decimal('25000.00')  # 100 * 250
     
     @pytest.mark.asyncio
     async def test_get_portfolio_summary(self, portfolio_service):
-        """Test getting portfolio summary"""
-        portfolio_data = PortfolioCreate(name="Test Portfolio")
+        ''"Test getting portfolio summary''"
+        portfolio_data = PortfolioCreate(name='Test Portfolio')
         portfolio = await portfolio_service.create_portfolio(portfolio_data)
         
         position_data = PositionCreate(
             portfolio_id=portfolio.id,
-            secid="SBER",
+            secid='SBER',
             quantity=100
         )
         await portfolio_service.create_position(position_data)
@@ -197,20 +197,20 @@ class TestPortfolioServiceIntegration:
         assert summary.portfolio.id == portfolio.id
         assert summary.positions_count == 1
         assert len(summary.positions) == 1
-        assert summary.positions[0].secid == "SBER"
+        assert summary.positions[0].secid == 'SBER'
 
 
 class TestDataManagerIsolation:
-    """Test that DataManager instances are properly isolated"""
+    ''"Test that DataManager instances are properly isolated''"
     
     def test_separate_instances_are_isolated(self):
-        """Test that separate DataManager instances don't share state"""
+        ''"Test that separate DataManager instances don't share state''"
         dm1 = DataManager()
         dm2 = DataManager()
         
         # Create data in first instance
         from app.modules.portfolio.models import Portfolio
-        portfolio1 = Portfolio(id=1, name="Portfolio 1")
+        portfolio1 = Portfolio(id=1, name='Portfolio 1')
         dm1.add_portfolio(portfolio1)
         
         # Second instance should not have this data
@@ -220,10 +220,10 @@ class TestDataManagerIsolation:
         # But first instance should still have it
         retrieved = dm1.get_portfolio(1)
         assert retrieved is not None
-        assert retrieved.name == "Portfolio 1"
+        assert retrieved.name == 'Portfolio 1'
     
     def test_id_counters_are_independent(self):
-        """Test that ID counters are independent between instances"""
+        ''"Test that ID counters are independent between instances''"
         dm1 = DataManager()
         dm2 = DataManager()
         

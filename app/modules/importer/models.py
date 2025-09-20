@@ -16,17 +16,17 @@ class SecurityPosition:
     @property
     def is_bond(self) -> bool:
         """Проверяет, является ли позиция облигацией"""
-        return "облигац" in self.security_type.lower()
+        return 'облигац' in self.security_type.lower()
     
     @property
     def is_stock(self) -> bool:
         """Проверяет, является ли позиция акцией"""
-        return "акц" in self.security_type.lower()
+        return 'акц' in self.security_type.lower()
     
     @property
     def is_etf(self) -> bool:
         """Проверяет, является ли позиция ETF"""
-        return self.security_type.lower() == "пиф"
+        return self.security_type.lower() == 'пиф'
 
 
 @dataclass

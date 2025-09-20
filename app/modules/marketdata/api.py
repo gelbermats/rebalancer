@@ -14,7 +14,7 @@ def get_marketdata_service(data_manager: DataManager = Depends(get_data_manager)
     return MarketDataService(data_manager)
 
 
-@router.get("/securities", response_model=List[Security])
+@router.get('/securities', response_model=List[Security])
 async def get_securities(
     skip: int = 0,
     limit: int = 100,
@@ -28,23 +28,23 @@ async def get_securities(
         await service.close()
 
 
-@router.post("/securities/sync")
+@router.post('/securities/sync')
 async def sync_securities(
-    engine: str = "stock",
-    market: str = "shares", 
+    engine: str = 'stock',
+    market: str = 'shares', 
     service: MarketDataService = Depends(get_marketdata_service)
 ):
     """Синхронизация ценных бумаг с MOEX"""
     try:
         count = await service.sync_securities_from_moex(engine=engine, market=market)
-        return {"message": f"Synchronized {count} securities from MOEX"}
+        return {'message': f'Synchronized {count} securities from MOEX'}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         await service.close()
 
 
-@router.get("/securities/{secid}/info")
+@router.get('/securities/{secid}/info')
 async def get_security_info(
     secid: str,
     service: MarketDataService = Depends(get_marketdata_service)
@@ -53,7 +53,7 @@ async def get_security_info(
     try:
         info = await service.get_security_info(secid)
         if not info:
-            raise HTTPException(status_code=404, detail="Security not found")
+            raise HTTPException(status_code=404, detail='Security not found')
         return info
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -61,11 +61,11 @@ async def get_security_info(
         await service.close()
 
 
-@router.post("/quotes/{secid}/sync")
+@router.post('/quotes/{secid}/sync')
 async def sync_quotes_for_security(
     secid: str,
-    from_date: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
-    to_date: Optional[str] = Query(None, description="End date (YYYY-MM-DD)"),
+    from_date: Optional[str] = Query(None, description='Start date (YYYY-MM-DD)'),
+    to_date: Optional[str] = Query(None, description='End date (YYYY-MM-DD)'),
     service: MarketDataService = Depends(get_marketdata_service)
 ):
     """Синхронизация исторических котировок для ценной бумаги"""
@@ -78,16 +78,16 @@ async def sync_quotes_for_security(
             try:
                 start_date = datetime.strptime(from_date, '%Y-%m-%d')
             except ValueError:
-                raise HTTPException(status_code=400, detail="Invalid from_date format. Use YYYY-MM-DD")
+                raise HTTPException(status_code=400, detail='Invalid from_date format. Use YYYY-MM-DD')
         
         if to_date:
             try:
                 end_date = datetime.strptime(to_date, '%Y-%m-%d')
             except ValueError:
-                raise HTTPException(status_code=400, detail="Invalid to_date format. Use YYYY-MM-DD")
+                raise HTTPException(status_code=400, detail='Invalid to_date format. Use YYYY-MM-DD')
         
         count = await service.sync_quotes_for_security(secid, start_date, end_date)
-        return {"message": f"Synchronized {count} quotes for {secid}"}
+        return {'message': f'Synchronized {count} quotes for {secid}'}
         
     except HTTPException:
         raise
@@ -97,7 +97,7 @@ async def sync_quotes_for_security(
         await service.close()
 
 
-@router.post("/quotes/current/update")
+@router.post('/quotes/current/update')
 async def update_current_prices(
     securities: List[str],
     service: MarketDataService = Depends(get_marketdata_service)
@@ -105,16 +105,16 @@ async def update_current_prices(
     """Обновление текущих цен для списка ценных бумаг"""
     try:
         count = await service.update_current_prices(securities)
-        return {"message": f"Updated current prices for {count} securities"}
+        return {'message': f'Updated current prices for {count} securities'}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         await service.close()
 
 
-@router.get("/quotes/current")
+@router.get('/quotes/current')
 async def get_current_quotes(
-    securities: List[str] = Query(..., description="List of security codes"),
+    securities: List[str] = Query(..., description='List of security codes'),
     service: MarketDataService = Depends(get_marketdata_service)
 ):
     """Получение текущих котировок с MOEX"""
@@ -127,7 +127,7 @@ async def get_current_quotes(
         await service.close()
 
 
-@router.get("/quotes/{secid}/latest", response_model=Quote)
+@router.get('/quotes/{secid}/latest', response_model=Quote)
 async def get_latest_quote(
     secid: str,
     service: MarketDataService = Depends(get_marketdata_service)
@@ -136,13 +136,13 @@ async def get_latest_quote(
     try:
         quote = await service.get_latest_quote(secid)
         if not quote:
-            raise HTTPException(status_code=404, detail="Quote not found")
+            raise HTTPException(status_code=404, detail='Quote not found')
         return quote
     finally:
         await service.close()
 
 
-@router.get("/quotes/{secid}/history", response_model=List[Quote])
+@router.get('/quotes/{secid}/history', response_model=List[Quote])
 async def get_quotes_history(
     secid: str,
     service: MarketDataService = Depends(get_marketdata_service)

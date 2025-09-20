@@ -26,22 +26,22 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title=settings.app_name,
-    description="Low-activity investment service for MOEX",
-    version="0.1.0",
+    description='Low-activity investment service for MOEX',
+    version='0.1.0',
     lifespan=lifespan,
 )
 
-app.include_router(marketdata_router, prefix="/api/v1/marketdata", tags=["MarketData"])
-app.include_router(portfolio_router, prefix="/api/v1/portfolio", tags=["Portfolio"])
+app.include_router(marketdata_router, prefix='/api/v1/marketdata', tags=['MarketData'])
+app.include_router(portfolio_router, prefix='/api/v1/portfolio', tags=['Portfolio'])
 
 
-@app.get("/")
+@app.get('/')
 async def root():
     """Health check endpoint"""
-    return {"message": "Rebalancer service is running", "version": "0.1.0"}
+    return {'message': 'Rebalancer service is running', 'version': '0.1.0'}
 
 
-@app.get("/health")
+@app.get('/health')
 async def health():
     """Health check endpoint"""
-    return {"status": "healthy"}
+    return {'status': 'healthy'}

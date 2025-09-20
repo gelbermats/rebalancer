@@ -6,10 +6,10 @@ from datetime import datetime
 
 
 class TestDataManager:
-    """Test DataManager functionality"""
+    ''"Test DataManager functionality''"
     
     def test_data_manager_initialization(self):
-        """Test that DataManager initializes correctly"""
+        ''"Test that DataManager initializes correctly''"
         dm = DataManager()
         
         # Check initial state
@@ -24,19 +24,19 @@ class TestDataManager:
         assert dm.get_next_quote_id() == 1
     
     def test_portfolio_operations(self):
-        """Test portfolio CRUD operations"""
+        ''"Test portfolio CRUD operations''"
         dm = DataManager()
         
         # Create portfolio
-        portfolio = Portfolio(id=1, name="Test Portfolio", description="Test Description")
+        portfolio = Portfolio(id=1, name='Test Portfolio', description='Test Description')
         dm.add_portfolio(portfolio)
         
         # Retrieve portfolio
         retrieved = dm.get_portfolio(1)
         assert retrieved is not None
         assert retrieved.id == 1
-        assert retrieved.name == "Test Portfolio"
-        assert retrieved.description == "Test Description"
+        assert retrieved.name == 'Test Portfolio'
+        assert retrieved.description == 'Test Description'
         
         # Get all portfolios
         all_portfolios = dm.get_all_portfolios()
@@ -48,16 +48,16 @@ class TestDataManager:
         assert non_existent is None
     
     def test_position_operations(self):
-        """Test position CRUD operations"""
+        ''"Test position CRUD operations''"
         dm = DataManager()
         
         # Create position
         position = Position(
             id=1,
             portfolio_id=1,
-            secid="SBER",
+            secid='SBER',
             quantity=100,
-            target_weight=Decimal("0.25")
+            target_weight=Decimal('0.25')
         )
         dm.add_position(position)
         
@@ -66,7 +66,7 @@ class TestDataManager:
         assert retrieved is not None
         assert retrieved.id == 1
         assert retrieved.portfolio_id == 1
-        assert retrieved.secid == "SBER"
+        assert retrieved.secid == 'SBER'
         assert retrieved.quantity == 100
         
         # Get all positions
@@ -84,83 +84,83 @@ class TestDataManager:
         assert len(empty_positions) == 0
     
     def test_security_operations(self):
-        """Test security CRUD operations"""
+        ''"Test security CRUD operations''"
         dm = DataManager()
         
         # Create security
-        security = Security(secid="SBER", name="Сбербанк", isin="RU0009029540")
+        security = Security(secid='SBER', name='Сбербанк', isin='RU0009029540')
         dm.add_security(security)
         
         # Retrieve security
-        retrieved = dm.get_security("SBER")
+        retrieved = dm.get_security('SBER')
         assert retrieved is not None
-        assert retrieved.secid == "SBER"
-        assert retrieved.name == "Сбербанк"
-        assert retrieved.isin == "RU0009029540"
+        assert retrieved.secid == 'SBER'
+        assert retrieved.name == 'Сбербанк'
+        assert retrieved.isin == 'RU0009029540'
         
         # Check security exists
-        assert dm.security_exists("SBER") is True
-        assert dm.security_exists("NONEXISTENT") is False
+        assert dm.security_exists('SBER') is True
+        assert dm.security_exists('NONEXISTENT') is False
         
         # Get all securities
         all_securities = dm.get_all_securities()
         assert len(all_securities) == 1
-        assert all_securities[0].secid == "SBER"
+        assert all_securities[0].secid == 'SBER'
         
         # Get non-existent security
-        non_existent = dm.get_security("NONEXISTENT")
+        non_existent = dm.get_security('NONEXISTENT')
         assert non_existent is None
     
     def test_quote_operations(self):
-        """Test quote CRUD operations"""
+        ''"Test quote CRUD operations''"
         dm = DataManager()
         
         # Create quote
         quote = Quote(
-            secid="SBER",
+            secid='SBER',
             timestamp=datetime.now(),
-            price=Decimal("250.00"),
-            volume=Decimal("1000")
+            price=Decimal('250.00'),
+            volume=Decimal('1000')
         )
         dm.add_quote(quote)
         
         # Get quotes for security
-        quotes = dm.get_quotes("SBER")
+        quotes = dm.get_quotes('SBER')
         assert len(quotes) == 1
-        assert quotes[0].secid == "SBER"
-        assert quotes[0].price == Decimal("250.00")
+        assert quotes[0].secid == 'SBER'
+        assert quotes[0].price == Decimal('250.00')
         
         # Get latest quote
-        latest = dm.get_latest_quote("SBER")
+        latest = dm.get_latest_quote('SBER')
         assert latest is not None
-        assert latest.secid == "SBER"
-        assert latest.price == Decimal("250.00")
+        assert latest.secid == 'SBER'
+        assert latest.price == Decimal('250.00')
         
         # Add another quote
         quote2 = Quote(
-            secid="SBER",
+            secid='SBER',
             timestamp=datetime.now(),
-            price=Decimal("260.00"),
-            volume=Decimal("1500")
+            price=Decimal('260.00'),
+            volume=Decimal('1500')
         )
         dm.add_quote(quote2)
         
         # Check that latest quote is updated
-        quotes = dm.get_quotes("SBER")
+        quotes = dm.get_quotes('SBER')
         assert len(quotes) == 2
         
-        latest = dm.get_latest_quote("SBER")
-        assert latest.price == Decimal("260.00")
+        latest = dm.get_latest_quote('SBER')
+        assert latest.price == Decimal('260.00')
         
         # Get quotes for non-existent security
-        empty_quotes = dm.get_quotes("NONEXISTENT")
+        empty_quotes = dm.get_quotes('NONEXISTENT')
         assert len(empty_quotes) == 0
         
-        no_quote = dm.get_latest_quote("NONEXISTENT")
+        no_quote = dm.get_latest_quote('NONEXISTENT')
         assert no_quote is None
     
     def test_id_counters(self):
-        """Test ID counter functionality"""
+        ''"Test ID counter functionality''"
         dm = DataManager()
         
         # Test portfolio ID counter
@@ -181,18 +181,18 @@ class TestDataManager:
         assert dm.get_next_quote_id() == 2
     
     def test_clear_all(self):
-        """Test clearing all data"""
+        ''"Test clearing all data''"
         dm = DataManager()
         
         # Add some data
-        portfolio = Portfolio(id=1, name="Test Portfolio")
-        position = Position(id=1, portfolio_id=1, secid="SBER", quantity=100)
-        security = Security(secid="SBER", name="Сбербанк")
+        portfolio = Portfolio(id=1, name='Test Portfolio')
+        position = Position(id=1, portfolio_id=1, secid='SBER', quantity=100)
+        security = Security(secid='SBER', name='Сбербанк')
         quote = Quote(
-            secid="SBER",
+            secid='SBER',
             timestamp=datetime.now(),
-            price=Decimal("250.00"),
-            volume=Decimal("1000")
+            price=Decimal('250.00'),
+            volume=Decimal('1000')
         )
         
         dm.add_portfolio(portfolio)
@@ -208,7 +208,7 @@ class TestDataManager:
         assert len(dm.get_all_portfolios()) == 1
         assert len(dm.get_all_positions()) == 1
         assert len(dm.get_all_securities()) == 1
-        assert len(dm.get_quotes("SBER")) == 1
+        assert len(dm.get_quotes('SBER')) == 1
         
         # Clear all
         dm.clear_all()
@@ -217,7 +217,7 @@ class TestDataManager:
         assert len(dm.get_all_portfolios()) == 0
         assert len(dm.get_all_positions()) == 0
         assert len(dm.get_all_securities()) == 0
-        assert len(dm.get_quotes("SBER")) == 0
+        assert len(dm.get_quotes('SBER')) == 0
         
         # Verify ID counters are reset
         assert dm.get_next_portfolio_id() == 1
@@ -226,19 +226,19 @@ class TestDataManager:
         assert dm.get_next_quote_id() == 1
     
     def test_multiple_portfolios_and_positions(self):
-        """Test complex scenario with multiple portfolios and positions"""
+        ''"Test complex scenario with multiple portfolios and positions''"
         dm = DataManager()
         
         # Create portfolios
-        portfolio1 = Portfolio(id=1, name="Portfolio 1")
-        portfolio2 = Portfolio(id=2, name="Portfolio 2")
+        portfolio1 = Portfolio(id=1, name='Portfolio 1')
+        portfolio2 = Portfolio(id=2, name='Portfolio 2')
         dm.add_portfolio(portfolio1)
         dm.add_portfolio(portfolio2)
         
         # Create positions for different portfolios
-        pos1 = Position(id=1, portfolio_id=1, secid="SBER", quantity=100)
-        pos2 = Position(id=2, portfolio_id=1, secid="GAZP", quantity=50)
-        pos3 = Position(id=3, portfolio_id=2, secid="SBER", quantity=200)
+        pos1 = Position(id=1, portfolio_id=1, secid='SBER', quantity=100)
+        pos2 = Position(id=2, portfolio_id=1, secid='GAZP', quantity=50)
+        pos3 = Position(id=3, portfolio_id=2, secid='SBER', quantity=200)
         
         dm.add_position(pos1)
         dm.add_position(pos2)
@@ -253,8 +253,8 @@ class TestDataManager:
         
         # Check specific positions
         portfolio1_secids = [pos.secid for pos in portfolio1_positions]
-        assert "SBER" in portfolio1_secids
-        assert "GAZP" in portfolio1_secids
+        assert 'SBER' in portfolio1_secids
+        assert 'GAZP' in portfolio1_secids
         
-        assert portfolio2_positions[0].secid == "SBER"
+        assert portfolio2_positions[0].secid == 'SBER'
         assert portfolio2_positions[0].quantity == 200

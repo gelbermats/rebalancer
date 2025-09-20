@@ -12,9 +12,7 @@ from app.modules.marketdata.schemas import SecurityCreate, QuoteCreate
 
 
 class MOEXAdapter:
-    """
-    Адаптер для работы с MOEX API через библиотеку aiomoex
-    """
+    """Адаптер для работы с MOEX API через библиотеку aiomoex"""
     
     def __init__(self):
         self.session = None
@@ -25,66 +23,54 @@ class MOEXAdapter:
             self.session = aiohttp.ClientSession()
         return self.session
     
-    async def get_securities(self, engine: str = "stock", market: str = "shares") -> List[dict]:
-        """
-        Получение списка ценных бумаг с MOEX
-        """
+    async def get_securities(self, engine: str = 'stock', market: str = 'shares') -> List[dict]:
+        """Получение списка ценных бумаг с MOEX"""
         try:
             session = await self._get_session()
             
-            # Получаем список торгуемых акций
-            securities = await aiomoex.get_market_securities(
+            securities = await aiomoex.get_board_securities(
                 session=session,
                 engine=engine,
                 market=market
             )
             
-            # Преобразуем в нужный формат
             result = []
             for sec in securities:
-                result.append([
-                    sec.get('SECID', ''),
-                    sec.get('SHORTNAME', ''),
-                    sec.get('ISIN', ''),
-                    sec.get('BOARDID', ''),
-                    sec.get('DECIMALS', 0),
-                    sec.get('SECNAME', ''),
-                    sec.get('REMARKS', ''),
-                    sec.get('MARKETCODE', ''),
-                    sec.get('INSTRID', ''),
-                    sec.get('SECTORID', '')
-                ])
+                result.append({
+                    'secid': sec.get('SECID', ''),
+                    'shortname': sec.get('SHORTNAME', ''),
+                    'isin': sec.get('ISIN', ''),
+                    'boardid': sec.get('BOARDID', ''),
+                    'decimals': sec.get('DECIMALS', 0),
+                    'lotsize': sec.get('LOTSIZE', 1),
+                    'facevalue': sec.get('FACEVALUE', 0),
+                    'secname': sec.get('SECNAME', ''),
+                    'remarks': sec.get('REMARKS', ''),
+                    'marketcode': sec.get('MARKETCODE', ''),
+                    'instrid': sec.get('INSTRID', ''),
+                    'sectorid': sec.get('SECTORID', '')
+                })
             
             return result
             
         except Exception as e:
-            print(f"Error fetching securities from MOEX: {e}")
+            print(f'Error fetching securities from MOEX: {e}')
             return []
     
     async def get_quotes(self, secid: str, from_date: Optional[datetime] = None, 
-                        to_date: Optional[datetime] = None, interval: str = "daily") -> List[dict]:
-        """
-        Получение котировок (свечей) для ценной бумаги
-        
-        Args:
-            secid: Код ценной бумаги
-            from_date: Дата начала периода
-            to_date: Дата окончания периода
-            interval: Интервал (daily, hourly, etc.)
-        """
+                        to_date: Optional[datetime] = None, interval: str = 'daily') -> List[dict]:
+        """Получение котировок (свечей) для ценной бумаги"""
         try:
             session = await self._get_session()
             
-            # Получаем исторические данные
             candles = await aiomoex.get_market_candles(
                 session=session,
                 security=secid,
                 start=from_date.strftime('%Y-%m-%d') if from_date else None,
                 end=to_date.strftime('%Y-%m-%d') if to_date else None,
-                interval=1 if interval == "daily" else 60  # 1 = дневные, 60 = часовые
+                interval=1 if interval == 'daily' else 60  # 1 = дневные, 60 = часовые
             )
             
-            # Преобразуем в нужный формат
             result = []
             for candle in candles:
                 result.append([
@@ -100,17 +86,14 @@ class MOEXAdapter:
             return result
             
         except Exception as e:
-            print(f"Error fetching quotes for {secid}: {e}")
+            print(f'Error fetching quotes for {secid}: {e}')
             return []
     
     async def get_current_quotes(self, securities: List[str]) -> List[dict]:
-        """
-        Получение текущих котировок для списка ценных бумаг
-        """
+        """Получение текущих котировок для списка ценных бумаг"""
         try:
             session = await self._get_session()
             
-            # Получаем текущие котировки
             quotes = await aiomoex.get_market_quotes(
                 session=session,
                 securities=securities
@@ -132,17 +115,14 @@ class MOEXAdapter:
             return result
             
         except Exception as e:
-            print(f"Error fetching current quotes: {e}")
+            print(f'Error fetching current quotes: {e}')
             return []
     
     async def get_security_info(self, secid: str) -> Optional[dict]:
-        """
-        Получение подробной информации о ценной бумаге
-        """
+        """Получение подробной информации о ценной бумаге"""
         try:
             session = await self._get_session()
             
-            # Получаем информацию о ценной бумаге
             info = await aiomoex.get_security_info(
                 session=session,
                 security=secid
@@ -170,7 +150,7 @@ class MOEXAdapter:
             return None
             
         except Exception as e:
-            print(f"Error fetching security info for {secid}: {e}")
+            print(f'Error fetching security info for {secid}: {e}')
             return None
     
     async def close(self):
@@ -203,20 +183,17 @@ class MarketDataService:
         self.data_manager.add_security(security)
         return security
     
-    async def sync_securities_from_moex(self, engine: str = "stock", market: str = "shares") -> int:
-        """
-        Синхронизация ценных бумаг с MOEX
-        Загружает актуальный список торгуемых бумаг
-        """
+    async def sync_securities_from_moex(self, engine: str = 'stock', market: str = 'shares') -> int:
+        """Синхронизация ценных бумаг с MOEX"""
         securities_data = await self.moex_adapter.get_securities(engine=engine, market=market)
         count = 0
         
         for sec_data in securities_data:
-            if len(sec_data) >= 2:
-                secid = sec_data[0]
-                name = sec_data[1] if len(sec_data) > 1 else ""
-                isin = sec_data[2] if len(sec_data) > 2 else None
-                board = sec_data[3] if len(sec_data) > 3 else None
+            if isinstance(sec_data, dict):
+                secid = sec_data.get('secid', '')
+                name = sec_data.get('shortname', '') or sec_data.get('secname', '')
+                isin = sec_data.get('isin', None)
+                board = sec_data.get('boardid', None)
                 
                 if secid and not self.data_manager.security_exists(secid):
                     security = Security(
@@ -238,9 +215,7 @@ class MarketDataService:
     
     async def sync_quotes_for_security(self, secid: str, from_date: Optional[datetime] = None, 
                                      to_date: Optional[datetime] = None) -> int:
-        """
-        Синхронизация котировок для конкретной ценной бумаги
-        """
+        """Синхронизация котировок для конкретной ценной бумаги"""
         quotes_data = await self.moex_adapter.get_quotes(secid, from_date, to_date)
         count = 0
         
@@ -254,24 +229,22 @@ class MarketDataService:
                     low_price = Decimal(str(quote_data[4])) if len(quote_data) > 4 and quote_data[4] else Decimal('0')
                     volume = Decimal(str(quote_data[6])) if len(quote_data) > 6 and quote_data[6] else Decimal('0')
                     
-                    # Парсим дату
                     timestamp = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00')) if timestamp_str else datetime.now()
                     
-                    # Используем цену закрытия как основную цену
                     quote = Quote(
                         secid=secid,
                         timestamp=timestamp,
                         price=close_price,
                         volume=volume,
-                        bid=low_price,  # Используем минимальную цену как bid
-                        ask=high_price  # Используем максимальную цену как ask
+                        bid=low_price,
+                        ask=high_price
                     )
                     
                     self.data_manager.add_quote(quote)
                     count += 1
                     
                 except (ValueError, TypeError) as e:
-                    print(f"Error parsing quote data for {secid}: {e}")
+                    print(f'Error parsing quote data for {secid}: {e}')
                     continue
         
         return count
@@ -281,10 +254,7 @@ class MarketDataService:
         return await self.moex_adapter.get_current_quotes(securities)
     
     async def update_current_prices(self, securities: List[str]) -> int:
-        """
-        Обновление текущих цен для списка ценных бумаг
-        Получает актуальные котировки с MOEX и сохраняет в локальное хранилище
-        """
+        """Обновление текущих цен для списка ценных бумаг"""
         current_quotes = await self.get_current_quotes(securities)
         count = 0
         
@@ -298,11 +268,9 @@ class MarketDataService:
                 timestamp_str = quote_data.get('timestamp', '')
                 
                 if secid and price:
-                    # Парсим время обновления или используем текущее время
                     if timestamp_str:
                         try:
                             timestamp = datetime.strptime(timestamp_str, '%H:%M:%S')
-                            # Устанавливаем сегодняшнюю дату
                             timestamp = timestamp.replace(
                                 year=datetime.now().year,
                                 month=datetime.now().month,
@@ -326,7 +294,7 @@ class MarketDataService:
                     count += 1
                     
             except (ValueError, TypeError) as e:
-                print(f"Error processing current quote: {e}")
+                print(f'Error processing current quote: {e}')
                 continue
         
         return count

@@ -65,7 +65,7 @@ class PortfolioService:
             return None
         
         positions = await self.get_portfolio_positions(portfolio_id)
-        total_unrealized_pnl = Decimal("0")
+        total_unrealized_pnl = Decimal('0')
         for position in positions:
             if position.unrealized_pnl:
                 total_unrealized_pnl += position.unrealized_pnl

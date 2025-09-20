@@ -12,12 +12,12 @@ class BrokerStatementParser:
     
     # Заголовки колонок в отчете (строка 7 и 23)
     HEADERS = [
-        "Эмитент",
-        "Наименование ценной бумаги", 
-        "Идентификационный номер",
-        "ISIN",
-        "Валюта/ номер/ серия",
-        "Остаток (шт.)"
+        'Эмитент',
+        'Наименование ценной бумаги', 
+        'Идентификационный номер',
+        'ISIN',
+        'Валюта/ номер/ серия',
+        'Остаток (шт.)'
     ]
     
     def __init__(self):
@@ -41,9 +41,9 @@ class BrokerStatementParser:
             )
             
         except Exception as e:
-            raise ValueError(f"Ошибка при парсинге файла: {str(e)}")
+            raise ValueError(f'Ошибка при парсинге файла: {str(e)}')
     
-    def parse_bytes(self, file_bytes: bytes, filename: str = "statement.xls") -> BrokerStatement:
+    def parse_bytes(self, file_bytes: bytes, filename: str = 'statement.xls') -> BrokerStatement:
         """Парсит Excel файл из байтов"""
         try:
             # Создаем BytesIO объект
@@ -64,7 +64,7 @@ class BrokerStatementParser:
             )
             
         except Exception as e:
-            raise ValueError(f"Ошибка при парсинге файла {filename}: {str(e)}")
+            raise ValueError(f'Ошибка при парсинге файла {filename}: {str(e)}')
     
     def _extract_account_number(self) -> str:
         """Извлекает номер счета из отчета"""
@@ -82,10 +82,10 @@ class BrokerStatementParser:
             if match:
                 return match.group(1)
                 
-            return "UNKNOWN"
+            return 'UNKNOWN'
             
         except Exception:
-            return "UNKNOWN"
+            return 'UNKNOWN'
     
     def _extract_positions(self) -> list[SecurityPosition]:
         """Извлекает позиции ценных бумаг из отчета"""
@@ -107,7 +107,7 @@ class BrokerStatementParser:
         
         # Ищем секцию с облигациями
         # В нашем файле это строки 8-20, но нужно найти динамически
-        start_row = self._find_section_start("Сведения о ценных бумагах")
+        start_row = self._find_section_start('Сведения о ценных бумагах')
         if start_row is None:
             return positions
             
@@ -119,12 +119,12 @@ class BrokerStatementParser:
                 row_data = self.df.iloc[i]
                 
                 # Проверяем что это не пустая строка и не заголовок
-                if pd.isna(row_data.iloc[0]) or "Эмитент" in str(row_data.iloc[0]):
+                if pd.isna(row_data.iloc[0]) or 'Эмитент' in str(row_data.iloc[0]):
                     continue
                 
                 # Проверяем что это облигация
-                security_type = str(row_data.iloc[1]) if len(row_data) > 1 else ""
-                if "облигац" not in security_type.lower():
+                security_type = str(row_data.iloc[1]) if len(row_data) > 1 else ''
+                if 'облигац' not in security_type.lower():
                     continue
                 
                 position = self._create_position_from_row(row_data)
@@ -133,7 +133,7 @@ class BrokerStatementParser:
                     
             except Exception as e:
                 # Логируем ошибку, но продолжаем обработку
-                print(f"Ошибка при обработке строки {i}: {e}")
+                print(f'Ошибка при обработке строки {i}: {e}')
                 continue
         
         return positions
@@ -144,10 +144,10 @@ class BrokerStatementParser:
         
         # Ищем секцию с акциями (обычно после облигаций)
         # В нашем файле это начинается со строки 24
-        start_row = self._find_section_start("Сведения о ценных бумагах, Classica")
+        start_row = self._find_section_start('Сведения о ценных бумагах, Classica')
         if start_row is None:
             # Пробуем найти по другому паттерну
-            start_row = self._find_row_with_text("Advanced Micro Devices")
+            start_row = self._find_row_with_text('Advanced Micro Devices')
             if start_row is None:
                 return positions
             start_row -= 1  # Отступаем на заголовок
@@ -160,11 +160,11 @@ class BrokerStatementParser:
                 row_data = self.df.iloc[i]
                 
                 # Проверяем что это не пустая строка и не заголовок
-                if pd.isna(row_data.iloc[0]) or "Эмитент" in str(row_data.iloc[0]):
+                if pd.isna(row_data.iloc[0]) or 'Эмитент' in str(row_data.iloc[0]):
                     continue
                 
                 # Проверяем что это не строка с итогом
-                if "Итого" in str(row_data.iloc[0]):
+                if 'Итого' in str(row_data.iloc[0]):
                     break
                 
                 position = self._create_position_from_row(row_data)
@@ -173,7 +173,7 @@ class BrokerStatementParser:
                     
             except Exception as e:
                 # Логируем ошибку, но продолжаем обработку
-                print(f"Ошибка при обработке строки {i}: {e}")
+                print(f'Ошибка при обработке строки {i}: {e}')
                 continue
         
         return positions
@@ -182,14 +182,14 @@ class BrokerStatementParser:
         """Создает объект позиции из строки данных"""
         try:
             # Извлекаем данные из колонок
-            issuer = str(row_data.iloc[0]).strip() if not pd.isna(row_data.iloc[0]) else ""
-            security_type = str(row_data.iloc[1]).strip() if len(row_data) > 1 and not pd.isna(row_data.iloc[1]) else ""
-            trading_code = str(row_data.iloc[2]).strip() if len(row_data) > 2 and not pd.isna(row_data.iloc[2]) else ""
-            isin = str(row_data.iloc[3]).strip() if len(row_data) > 3 and not pd.isna(row_data.iloc[3]) else ""
+            issuer = str(row_data.iloc[0]).strip() if not pd.isna(row_data.iloc[0]) else ''
+            security_type = str(row_data.iloc[1]).strip() if len(row_data) > 1 and not pd.isna(row_data.iloc[1]) else ''
+            trading_code = str(row_data.iloc[2]).strip() if len(row_data) > 2 and not pd.isna(row_data.iloc[2]) else ''
+            isin = str(row_data.iloc[3]).strip() if len(row_data) > 3 and not pd.isna(row_data.iloc[3]) else ''
             currency = str(row_data.iloc[4]).strip() if len(row_data) > 4 and not pd.isna(row_data.iloc[4]) else None
             
             # Извлекаем количество
-            quantity_str = str(row_data.iloc[5]).strip() if len(row_data) > 5 and not pd.isna(row_data.iloc[5]) else "0"
+            quantity_str = str(row_data.iloc[5]).strip() if len(row_data) > 5 and not pd.isna(row_data.iloc[5]) else '0'
             
             # Очищаем количество от пробелов и преобразуем в число
             quantity_str = re.sub(r'\s+', '', quantity_str)
@@ -204,12 +204,12 @@ class BrokerStatementParser:
                 security_type=security_type,
                 trading_code=trading_code,
                 isin=isin,
-                currency=currency if currency and currency != "nan" else None,
+                currency=currency if currency and currency != 'nan' else None,
                 quantity=quantity
             )
             
         except Exception as e:
-            print(f"Ошибка при создании позиции: {e}")
+            print(f'Ошибка при создании позиции: {e}')
             return None
     
     def _find_section_start(self, section_name: str) -> Optional[int]:
@@ -232,11 +232,11 @@ class BrokerStatementParser:
                 return i
             
             # Если нашли строку с итогом
-            if "Итого" in str(row_data.iloc[0]):
+            if 'Итого' in str(row_data.iloc[0]):
                 return i
                 
             # Если нашли новую секцию
-            if "Сведения о ценных бумагах" in str(row_data.iloc[0]):
+            if 'Сведения о ценных бумагах' in str(row_data.iloc[0]):
                 return i
         
         return total_rows
@@ -260,17 +260,17 @@ class ImportService:
         """Импортирует данные из файла"""
         return self.parser.parse_file(file_path)
     
-    def import_from_bytes(self, file_bytes: bytes, filename: str = "statement.xls") -> BrokerStatement:
+    def import_from_bytes(self, file_bytes: bytes, filename: str = 'statement.xls') -> BrokerStatement:
         """Импортирует данные из байтов файла"""
         return self.parser.parse_bytes(file_bytes, filename)
     
     def validate_statement(self, statement: BrokerStatement) -> dict:
         """Валидирует импортированные данные"""
         return {
-            "valid": True,
-            "account_number": statement.account_number,
-            "total_positions": statement.total_positions,
-            "bonds": len(statement.bonds),
-            "stocks": len(statement.stocks),
-            "etfs": len(statement.etfs)
+            'valid': True,
+            'account_number': statement.account_number,
+            'total_positions': statement.total_positions,
+            'bonds': len(statement.bonds),
+            'stocks': len(statement.stocks),
+            'etfs': len(statement.etfs)
         }

@@ -7,7 +7,7 @@ from .schemas import BrokerStatementResponse, SecurityPositionResponse, ImportSt
 from .models import BrokerStatement, SecurityPosition
 
 
-router = APIRouter(prefix="/import", tags=["import"])
+router = APIRouter(prefix='/import', tags=['import'])
 
 
 def get_import_service() -> ImportService:
@@ -43,7 +43,7 @@ def _convert_statement_to_response(statement: BrokerStatement) -> BrokerStatemen
     )
 
 
-@router.post("/broker-statement", response_model=BrokerStatementResponse)
+@router.post('/broker-statement', response_model=BrokerStatementResponse)
 async def upload_broker_statement(
     file: UploadFile = File(...),
     import_service: ImportService = Depends(get_import_service)
@@ -61,7 +61,7 @@ async def upload_broker_statement(
     if not file.filename or not file.filename.endswith(('.xls', '.xlsx')):
         raise HTTPException(
             status_code=400,
-            detail="Поддерживаются только Excel файлы (.xls, .xlsx)"
+            detail='Поддерживаются только Excel файлы (.xls, .xlsx)'
         )
     
     try:
@@ -79,11 +79,11 @@ async def upload_broker_statement(
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Внутренняя ошибка при обработке файла: {str(e)}"
+            detail=f'Внутренняя ошибка при обработке файла: {str(e)}'
         )
 
 
-@router.post("/broker-statement/validate", response_model=dict)
+@router.post('/broker-statement/validate', response_model=dict)
 async def validate_broker_statement(
     file: UploadFile = File(...),
     import_service: ImportService = Depends(get_import_service)
@@ -101,7 +101,7 @@ async def validate_broker_statement(
     if not file.filename or not file.filename.endswith(('.xls', '.xlsx')):
         raise HTTPException(
             status_code=400,
-            detail="Поддерживаются только Excel файлы (.xls, .xlsx)"
+            detail='Поддерживаются только Excel файлы (.xls, .xlsx)'
         )
     
     try:
@@ -121,11 +121,11 @@ async def validate_broker_statement(
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Внутренняя ошибка при валидации файла: {str(e)}"
+            detail=f'Внутренняя ошибка при валидации файла: {str(e)}'
         )
 
 
-@router.get("/broker-statement/example", response_model=dict)
+@router.get('/broker-statement/example', response_model=dict)
 async def get_example_format():
     """
     Возвращает описание ожидаемого формата брокерского отчета
@@ -135,27 +135,27 @@ async def get_example_format():
     """
     
     return {
-        "description": "Формат брокерского отчета",
-        "required_sheet": "Account_Statement_auto_EXC",
-        "structure": {
-            "account_info": "Строка 3-4: Информация о счете",
-            "bonds_section": {
-                "start": "Строка с текстом 'Сведения о ценных бумагах'",
-                "headers": "Следующая строка: Эмитент, Наименование ценной бумаги, Идентификационный номер, ISIN, Валюта/номер/серия, Остаток (шт.)",
-                "data": "Последующие строки с данными об облигациях"
+        'description': 'Формат брокерского отчета',
+        'required_sheet': 'Account_Statement_auto_EXC',
+        'structure': {
+            'account_info': 'Строка 3-4: Информация о счете',
+            'bonds_section': {
+                'start': 'Строка с текстом \'Сведения о ценных бумагах\'',
+                'headers': 'Следующая строка: Эмитент, Наименование ценной бумаги, Идентификационный номер, ISIN, Валюта/номер/серия, Остаток (шт.)',
+                'data': 'Последующие строки с данными об облигациях'
             },
-            "stocks_section": {
-                "start": "Строка с текстом 'Сведения о ценных бумагах, Classica'",
-                "headers": "Те же заголовки что и для облигаций",
-                "data": "Данные об акциях и ETF"
+            'stocks_section': {
+                'start': 'Строка с текстом \'Сведения о ценных бумагах, Classica\'',
+                'headers': 'Те же заголовки что и для облигаций',
+                'data': 'Данные об акциях и ETF'
             }
         },
-        "columns": [
-            {"name": "Эмитент", "description": "Наименование эмитента ценной бумаги"},
-            {"name": "Наименование ценной бумаги", "description": "Тип: акция, облигация, ПИФ"},
-            {"name": "Идентификационный номер", "description": "Торговый код на бирже"},
-            {"name": "ISIN", "description": "Международный идентификационный код"},
-            {"name": "Валюта/номер/серия", "description": "Дополнительная информация (может быть пустой)"},
-            {"name": "Остаток (шт.)", "description": "Количество ценных бумаг в штуках"}
+        'columns': [
+            {'name': 'Эмитент', 'description': 'Наименование эмитента ценной бумаги'},
+            {'name': 'Наименование ценной бумаги', 'description': 'Тип: акция, облигация, ПИФ'},
+            {'name': 'Идентификационный номер', 'description': 'Торговый код на бирже'},
+            {'name': 'ISIN', 'description': 'Международный идентификационный код'},
+            {'name': 'Валюта/номер/серия', 'description': 'Дополнительная информация (может быть пустой)'},
+            {'name': 'Остаток (шт.)', 'description': 'Количество ценных бумаг в штуках'}
         ]
     }
